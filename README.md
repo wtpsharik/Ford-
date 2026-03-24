@@ -30,15 +30,3 @@
 ##  Backend         | Django, , PostgreSQL
 ##  Frontend        | React
 ##  Тестирование    | pytest (бэкенд)
-
-
-
-
-### Установка бэкенда
-cd backend
-python -m venv venv
-source venv/bin/activate  # или .\venv\Scripts\activate на Windows
-pip install -r requirements.txt
-cp .env.example .env      # настройте переменные окружения
-python manage.py migrate
-python manage.py createsuperuser  # для доступа в админку
