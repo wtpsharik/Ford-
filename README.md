@@ -12,24 +12,65 @@
 
 ##  Организация работы
 
-ford-auto-sales/
-├── backend/ # Django проект
-│ ├── api/ # Приложение с API (модели, сериализаторы, views)
-│ ├── backend/ # Настройки проекта
-│ ├── manage.py
-│ └── requirements.txt
-├── frontend/ # React приложение
-│ ├── public/
-│ └── src/
-│ ├── components/ # Карточки авто, формы, фильтры
-│ ├── pages/ # Каталог, детальная страница, профиль
-│ ├── styles/ # CSS переменные (фирменные цвета Ford)
-│ ├── App.jsx
-│ └── main.jsx
-├── docs/ # Документация и артефакты (см. ниже)
-├── .env.example
+ford-auto-sales/                   # корень репозитория
+├── backend/                        # Django проект
+│   ├── api/                        # приложение с API
+│   │   ├── migrations/             # миграции БД
+│   │   ├── models.py               # модели: Car, Customer, Order, Configuration
+│   │   ├── serializers.py          # сериализаторы DRF
+│   │   ├── views.py                # API views (CarViewSet, OrderViewSet и др.)
+│   │   ├── urls.py                 # маршруты API
+│   │   ├── tests/                  # модульные тесты (pytest)
+│   │   └── admin.py                # настройка админ-панели
+│   ├── backend/                    # настройки проекта Django
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   ├── manage.py
+│   └── requirements.txt            # зависимости Python
+│
+├── frontend/                       # React приложение (Vite)
+│   ├── public/                     # статика
+│   ├── src/
+│   │   ├── components/             # переиспользуемые компоненты
+│   │   │   ├── CarCard.jsx         # карточка автомобиля
+│   │   │   ├── FilterPanel.jsx     # панель фильтров
+│   │   │   ├── OrderForm.jsx       # форма оформления заказа
+│   │   │   └── ...
+│   │   ├── pages/                  # страницы
+│   │   │   ├── CatalogPage.jsx     # каталог автомобилей
+│   │   │   ├── CarDetailPage.jsx   # детальная страница авто
+│   │   │   ├── ProfilePage.jsx     # личный кабинет (история заказов)
+│   │   │   ├── AdminPanel.jsx      # панель сотрудника
+│   │   │   └── LoginPage.jsx
+│   │   ├── styles/                 # глобальные стили
+│   │   │   ├── variables.css       # CSS-переменные (фирменные цвета Ford)
+│   │   │   └── global.css
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── api.js                  # настройка axios для запросов к бэкенду
+│   ├── package.json
+│   └── vite.config.js
+│
+├── docs/                           # документация и организационные артефакты
+│   ├── architecture/               # UML-диаграммы
+│   │   ├── use_case.png
+│   │   ├── class_diagram.png
+│   │   └── sequence_diagram_order.png
+│   ├── kanban.md                   # доска задач
+│   ├── wiki/                       # база знаний по выполненным задачам
+│   │   ├── car_model.md
+│   │   ├── order_flow.md
+│   │   └── ...
+│   └── integration/                # спецификации для интеграции
+│       ├── order_api.md
+│       └── price_calculation.md
+│
+├── .env.example                    # пример переменных окружения
 ├── .gitignore
-├── README.md
+├── README.md                       # описание проекта
+├── RULES.md                        # правила командной работы
+└── TODO.md                         # текущие задачи в формате канбан
 
 - Каждый участник выполняет роли **разработчика** (пишет код + структурные тесты) и **тестировщика** (пишет функциональные тесты + проверяет вручную).
 - Интеграция компонентов проводится на занятиях. Демонстрация преподавателю — каждую пару.
