@@ -21,6 +21,6 @@
 
 ## 🛠 Технологический стек
 
-##  Backend         | Django, , PostgreSQL
-##  Frontend        | React
-##  Тестирование    | pytest (бэкенд)
+- Backend         | Django, , PostgreSQL
+- Frontend        | React
+- Тестирование    | pytest (бэкенд)
