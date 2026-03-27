@@ -26,3 +26,6 @@
 - Backend         | Django, PostgreSQL
 - Frontend        | React
 - Тестирование    | pytest (бэкенд)
+
+
+☠☠☠☠☠
