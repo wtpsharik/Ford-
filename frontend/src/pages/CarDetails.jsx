@@ -2,34 +2,94 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Check, Shield, ChevronLeft } from 'lucide-react';
 
-const CARS_DB = [
-  { id: 1, name: 'Ford Bronco Sport', type: 'Внедорожник', price: 3450000, priceText: '3 450 000 ₽', engine: '1.5L EcoBoost', hp: '181 л.с.', transmission: '8-АКПП', drive: 'Полный (4WD)', status: 'В наличии', image: 'https://images.unsplash.com/photo-1620882814836-98ecfb8fb5ce?q=80&w=1200&auto=format&fit=crop' },
-  { id: 2, name: 'Ford Explorer', type: 'Кроссовер', price: 4800000, priceText: '4 800 000 ₽', engine: '2.3L EcoBoost', hp: '300 л.с.', transmission: '10-АКПП', drive: 'Полный (AWD)', status: 'В наличии', image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=1200&auto=format&fit=crop' },
-  { id: 3, name: 'Ford F-150 Raptor', type: 'Пикап', price: 8900000, priceText: '8 900 000 ₽', engine: '3.5L V6', hp: '450 л.с.', transmission: '10-АКПП', drive: 'Полный (4WD)', status: 'Под заказ', image: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=1200&auto=format&fit=crop' },
-  { id: 4, name: 'Mustang Mach-E', type: 'Электро', price: 5200000, priceText: '5 200 000 ₽', engine: 'Электродвигатель', hp: '266 л.с.', transmission: 'Редуктор', drive: 'Полный (AWD)', status: 'В наличии', image: 'https://images.unsplash.com/photo-1642878235214-7407077fb571?q=80&w=1200&auto=format&fit=crop' },
-  { id: 5, name: 'Ford Kuga', type: 'Кроссовер', price: 3100000, priceText: '3 100 000 ₽', engine: '2.0L', hp: '190 л.с.', transmission: '8-АКПП', drive: 'Передний', status: 'В наличии', image: 'https://images.unsplash.com/photo-1582467029213-ce71667c2e28?q=80&w=1200&auto=format&fit=crop' },
-  { id: 6, name: 'Ford Ranger', type: 'Пикап', price: 4100000, priceText: '4 100 000 ₽', engine: '2.0L', hp: '213 л.с.', transmission: '10-АКПП', drive: 'Полный (4WD)', status: 'В наличии', image: 'https://images.unsplash.com/photo-1612166683838-892ce3b8602b?q=80&w=1200&auto=format&fit=crop' }
-];
-
 export default function CarDetails() {
   const { id } = useParams();
-  const car = CARS_DB.find(c => c.id === parseInt(id)) || CARS_DB[0];
   
+  const [car, setCar] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('specs');
-  const [downPayment, setDownPayment] = useState(car.price * 0.2);
+  
+  const [downPayment, setDownPayment] = useState(0);
   const [term, setTerm] = useState(36);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    setLoading(true);
+
+    fetch(`http://127.0.0.1:8000/api/cars/${id}/`)
+      .then(response => response.json())
+      .then(data => {
+        setCar(data);
+        setDownPayment(data.price * 0.2);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Ошибка получения авто:", error);
+        setLoading(false);
+      });
   }, [id]);
 
   const calculateCredit = () => {
+    if (!car) return 0;
     const loanAmount = car.price - downPayment;
     const monthlyRate = 0.12 / 12;
     if (loanAmount <= 0) return 0;
     const payment = (loanAmount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -term));
     return Math.round(payment).toLocaleString('ru-RU');
   };
+
+  const handleCreditSubmit = async () => {
+    const formData = {
+      client_name: "Клиент с сайта (Кредит)", 
+      phone: "Не указан",
+      type: "Заявка на кредит",
+      car_interest: car.name,
+      status: "Новая"
+    };
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/requests/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      if (response.ok) alert('Заявка на кредит успешно отправлена в салон!');
+      else alert('Ошибка при отправке данных.');
+    } catch (error) {
+      alert('Ошибка соединения с сервером.');
+    }
+  };
+
+  const handleTradeInSubmit = async (e) => {
+    e.preventDefault();
+    const formData = {
+      client_name: "Оценка авто: " + e.target[0].value + " (" + e.target[1].value + " г.в.)", 
+      phone: e.target[2].value, 
+      type: "Trade-in",
+      car_interest: car.name, 
+      status: "Новая"
+    };
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/requests/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      if (response.ok) {
+        alert('Заявка на Trade-in успешно отправлена!');
+        e.target.reset();
+      } else {
+        alert('Ошибка при отправке данных.');
+      }
+    } catch (error) {
+      alert('Ошибка соединения с сервером.');
+    }
+  };
+
+  if (loading) return <div className="container" style={{ padding: '100px 24px', textAlign: 'center' }}><h2>Загрузка данных об автомобиле...</h2></div>;
+  if (!car || !car.name) return <div className="container" style={{ padding: '100px 24px', textAlign: 'center' }}><h2>Автомобиль не найден :(</h2><Link to="/catalog">Вернуться в каталог</Link></div>;
 
   return (
     <div className="container" style={{ padding: '40px 24px', minHeight: '80vh' }}>
@@ -48,18 +108,14 @@ export default function CarDetails() {
           <p className="car-details-price">{car.priceText}</p>
           
           <div className="car-quick-specs">
-            <div className="quick-spec-item">
-              <span className="spec-label">Двигатель</span><span className="spec-value">{car.engine}</span>
-            </div>
-            <div className="quick-spec-item">
-              <span className="spec-label">Мощность</span><span className="spec-value">{car.hp}</span>
-            </div>
-            <div className="quick-spec-item">
-              <span className="spec-label">Привод</span><span className="spec-value">{car.drive}</span>
-            </div>
+            <div className="quick-spec-item"><span className="spec-label">Двигатель</span><span className="spec-value">{car.engine}</span></div>
+            <div className="quick-spec-item"><span className="spec-label">Мощность</span><span className="spec-value">{car.hp}</span></div>
+            <div className="quick-spec-item"><span className="spec-label">Привод</span><span className="spec-value">{car.drive}</span></div>
           </div>
 
-          <button className="btn-primary large" style={{width: '100%', marginBottom: '12px'}}>Записаться на тест-драйв</button>
+          <button className="btn-primary large" style={{width: '100%', marginBottom: '12px'}} onClick={() => alert("Для записи на тест-драйв воспользуйтесь кнопкой 'Заказать звонок' в шапке сайта")}>
+            Записаться на тест-драйв
+          </button>
           <p className="warranty-info"><Shield size={16} /> Гарантия 3 года или 100 000 км</p>
         </div>
       </div>
@@ -72,6 +128,7 @@ export default function CarDetails() {
         </div>
 
         <div className="tab-content">
+          
           {activeTab === 'specs' && (
             <div className="specs-grid">
               <div className="spec-row"><span>Тип кузова</span><strong>{car.type}</strong></div>
@@ -98,7 +155,7 @@ export default function CarDetails() {
                 <h3>Ежемесячный платеж:</h3>
                 <div className="payment-amount">{calculateCredit()} ₽ / мес</div>
                 <p>Ставка: от 12% годовых. Данный расчет является предварительным.</p>
-                <button className="btn-primary" style={{marginTop: '20px'}}>Отправить заявку на кредит</button>
+                <button className="btn-primary" style={{marginTop: '20px'}} onClick={handleCreditSubmit}>Отправить заявку на кредит</button>
               </div>
             </div>
           )}
@@ -106,15 +163,17 @@ export default function CarDetails() {
           {activeTab === 'tradein' && (
             <div className="tradein-form">
               <h3>Оцените свой автомобиль онлайн</h3>
-              <p>Получите скидку до 200 000 ₽ при сдаче старого авто в Trade-in.</p>
-              <form className="modal-form" style={{maxWidth: '500px', marginTop: '20px'}}>
-                <input type="text" placeholder="Марка и модель (напр. Kia Rio)" required />
+              <p>Получите дополнительную скидку до 200 000 ₽ при сдаче старого авто в Trade-in.</p>
+              
+              <form className="modal-form" onSubmit={handleTradeInSubmit} style={{maxWidth: '500px', marginTop: '20px'}}>
+                <input type="text" placeholder="Марка и модель (напр. Ford Focus)" required />
                 <input type="number" placeholder="Год выпуска" required min="1990" max="2024" />
                 <input type="text" placeholder="Ваш телефон для связи" required />
-                <button type="submit" className="btn-primary" onClick={(e) => {e.preventDefault(); alert('Заявка отправлена!');}}>Узнать стоимость</button>
+                <button type="submit" className="btn-primary" style={{marginTop: '10px'}}>Узнать стоимость</button>
               </form>
             </div>
           )}
+
         </div>
       </div>
     </div>

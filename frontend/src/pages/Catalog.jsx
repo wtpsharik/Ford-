@@ -1,27 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search } from 'lucide-react';
 
-const ALL_CARS = [
-  { id: 1, name: 'Ford Bronco Sport', type: 'Внедорожник', price: 3450000, priceText: 'от 3 450 000 ₽', engine: '1.5L', hp: '181 л.с.', image: 'https://images.unsplash.com/photo-1620882814836-98ecfb8fb5ce?q=80&w=800&auto=format&fit=crop' },
-  { id: 2, name: 'Ford Explorer', type: 'Кроссовер', price: 4800000, priceText: 'от 4 800 000 ₽', engine: '2.3L', hp: '300 л.с.', image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=800&auto=format&fit=crop' },
-  { id: 3, name: 'Ford F-150 Raptor', type: 'Пикап', price: 8900000, priceText: 'от 8 900 000 ₽', engine: '3.5L', hp: '450 л.с.', image: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=800&auto=format&fit=crop' },
-  { id: 4, name: 'Mustang Mach-E', type: 'Электро', price: 5200000, priceText: 'от 5 200 000 ₽', engine: 'Электро', hp: '266 л.с.', image: 'https://images.unsplash.com/photo-1642878235214-7407077fb571?q=80&w=800&auto=format&fit=crop' },
-  { id: 5, name: 'Ford Kuga', type: 'Кроссовер', price: 3100000, priceText: 'от 3 100 000 ₽', engine: '2.0L', hp: '190 л.с.', image: 'https://images.unsplash.com/photo-1582467029213-ce71667c2e28?q=80&w=800&auto=format&fit=crop' },
-  { id: 6, name: 'Ford Ranger', type: 'Пикап', price: 4100000, priceText: 'от 4 100 000 ₽', engine: '2.0L', hp: '213 л.с.', image: 'https://images.unsplash.com/photo-1612166683838-892ce3b8602b?q=80&w=800&auto=format&fit=crop' }
-];
-
-const BODY_TYPES = ['Все', 'Кроссовер', 'Внедорожник', 'Пикап', 'Электро'];
+const BODY_TYPES = ['Все', 'Кроссовер', 'Внедорожник', 'Пикап', 'Электро', 'Лифтбек'];
 
 export default function Catalog() {
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('Все');
 
-  const filteredCars = ALL_CARS.filter(car => {
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/api/cars/')
+      .then(response => response.json())
+      .then(data => {
+        setCars(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Ошибка при получении данных:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  const filteredCars = cars.filter(car => {
     const matchesSearch = car.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = selectedType === 'Все' || car.type === selectedType;
     return matchesSearch && matchesType;
   });
+
+  if (loading) {
+    return <div className="container" style={{ padding: '100px 24px', textAlign: 'center' }}><h2>Загрузка автомобилей из базы данных...</h2></div>;
+  }
 
   return (
     <div className="container" style={{ padding: '40px 24px', minHeight: '80vh' }}>
@@ -76,6 +87,7 @@ export default function Catalog() {
                       <span>{car.engine}</span><span className="dot">•</span><span>{car.hp}</span>
                     </div>
                     <div className="car-footer">
+                      {/* Используем priceText из базы данных */}
                       <span className="car-price">{car.priceText}</span>
                       <Link to={`/car/${car.id}`} className="btn-secondary">Подробнее</Link>
                     </div>

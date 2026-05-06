@@ -212,7 +212,7 @@ main, .container {
 .catalog-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 30px;
+  gap: 24px;
 }
 
 .car-card {
@@ -482,12 +482,12 @@ main, .container {
 
 .catalog-layout {
   display: flex;
-  gap: 40px;
+  gap: 30px;
   align-items: flex-start;
 }
 
 .filters-sidebar {
-  width: 280px;
+  width: 260px;
   flex-shrink: 0;
   background-color: var(--bg-light);
   padding: 24px;
@@ -562,7 +562,8 @@ main, .container {
 }
 
 .catalog-content {
-  flex-grow: 1;
+  flex: 1; 
+  min-width: 0;
 }
 
 .results-count {

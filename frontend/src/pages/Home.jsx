@@ -2,10 +2,25 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const CARS_PREVIEW = [
-  { id: 1, name: 'Ford Bronco Sport', type: 'Внедорожник', price: 'от 3 450 000 ₽', engine: '1.5L', hp: '181 л.с.', image: 'https://images.unsplash.com/photo-1620882814836-98ecfb8fb5ce?q=80&w=800&auto=format&fit=crop' },
-  { id: 2, name: 'Ford Explorer', type: 'Кроссовер', price: 'от 4 800 000 ₽', engine: '2.3L', hp: '300 л.с.', image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=800&auto=format&fit=crop' },
+  { 
+    id: 1, 
+    name: 'Ford Bronco Sport', 
+    type: 'Внедорожник', 
+    price: 'от 3 450 000 ₽', 
+    engine: '1.5L', 
+    hp: '181 л.с.', 
+    image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=800&auto=format&fit=crop' 
+  },
+  { 
+    id: 2, 
+    name: 'Ford Explorer', 
+    type: 'Кроссовер', 
+    price: 'от 4 800 000 ₽', 
+    engine: '2.3L', 
+    hp: '300 л.с.', 
+    image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=800&auto=format&fit=crop' 
+  },
 ];
-
 export default function Home({ onOpenModal }) {
   return (
     <main>
